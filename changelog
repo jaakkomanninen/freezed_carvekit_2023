@@ -1,0 +1,7 @@
+Modifying this amazing starting point to fit my project needs.
+
+Goals: create a more responsive experience, send webhooks from the process. At this stage I'm testing and experimenting. Once I have something that I think is useful, I will send an official request.
+
+Other things on my todo: add automatic image placement/scaling/rotation fix.
+
+2/16/23 Work in progress: add webhooks to give feedback on the progress as well as include Tumplate integration (create temp files for Tumplate users) as well as allowing authentication to Tumplate users.
