@@ -1,14 +1,11 @@
 import secrets
 from typing import List
 from typing_extensions import Literal
-
 import torch.cuda
 from pydantic import BaseModel, validator
 
 
 class AuthConfig(BaseModel):
-    """Config for web api token authentication"""
-
     auth: bool = True
     """Enables Token Authentication for API"""
     admin_token: str = secrets.token_hex(32)
@@ -24,9 +21,11 @@ class MLConfig(BaseModel):
         "u2net", "deeplabv3", "basnet", "tracer_b7", "isnet"
     ] = "tracer_b7"
     """Segmentation Network"""
-    preprocessing_method: Literal["none", "stub", "autoscene", "auto"] = "autoscene"
+    preprocessing_method: Literal["none", "stub",
+                                  "autoscene", "auto"] = "autoscene"
     """Pre-processing Method"""
-    postprocessing_method: Literal["fba", "cascade_fba", "none"] = "cascade_fba"
+    postprocessing_method: Literal["fba",
+                                   "cascade_fba", "none"] = "cascade_fba"
     """Post-Processing Network"""
     device: str = "cpu"
     """Processing device"""
@@ -88,7 +87,8 @@ class MLConfig(BaseModel):
                 "GPU is not available, but specified as processing device!"
             )
         if "cuda" not in value and "cpu" != value:
-            raise ValueError("Unknown processing device! It should be cpu or cuda!")
+            raise ValueError(
+                "Unknown processing device! It should be cpu or cuda!")
         return value
 
 

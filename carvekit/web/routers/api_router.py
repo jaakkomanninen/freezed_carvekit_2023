@@ -2,8 +2,11 @@ import base64
 import http
 import io
 import time
+import json
 from json import JSONDecodeError
-from typing import Optional
+from typing import Optional, Union
+from datetime import datetime
+from loguru import logger
 
 import requests
 from PIL import Image
@@ -19,16 +22,22 @@ from carvekit.web.schemas.request import Parameters
 from carvekit.web.utils.net_utils import is_loopback
 
 api_router = APIRouter(prefix="", tags=["api"])
-
+tempfileurl = "https://api.tumplate.com/api/temp-files"
+webhookurl = "https://webhook.site/210e24a1-cdd2-4a51-a2c0-d90a06c96956"
 
 # noinspection PyBroadException
+
+
 @api_router.post("/removebg")
 async def removebg(
     request: Request,
     image_file: Optional[bytes] = File(None),
+    image_name: Optional[str] = Form("untitled"),
+    tumplate_auth_token: Optional[str] = Form(None),
     auth: bool = Depends(Authenticate),
     content_type: str = Header(""),
     image_file_b64: Optional[str] = Form(None),
+    draft_id: Optional[str] = Form(None),
     image_url: Optional[str] = Form(None),
     bg_image_file: Optional[bytes] = File(None),
     size: Optional[str] = Form("full"),
@@ -44,16 +53,14 @@ async def removebg(
     semitransparency: bool = Form(False),  # Not supported at the moment
     bg_color: Optional[str] = Form(""),
 ):
-    if auth is False:
-        return JSONResponse(content=error_dict("Missing API Key"), status_code=403)
     if (
-        content_type not in ["application/x-www-form-urlencoded", "application/json"]
+        content_type not in [
+            "application/x-www-form-urlencoded", "application/json"]
         and "multipart/form-data" not in content_type
     ):
         return JSONResponse(
             content=error_dict("Invalid request content type"), status_code=400
         )
-
     if image_url:
         if not (
             image_url.startswith("http://") or image_url.startswith("https://")
@@ -79,7 +86,8 @@ async def removebg(
             if len(image_file_b64) == 0:
                 return JSONResponse(content=error_dict("Empty image"), status_code=400)
             try:
-                image = Image.open(io.BytesIO(base64.b64decode(image_file_b64)))
+                image = Image.open(io.BytesIO(
+                    base64.b64decode(image_file_b64)))
             except BaseException:
                 return JSONResponse(
                     content=error_dict("Error decode image!"), status_code=400
@@ -89,7 +97,7 @@ async def removebg(
                 image = Image.open(io.BytesIO(requests.get(image_url).content))
             except BaseException:
                 return JSONResponse(
-                    content=error_dict("Error download image!"), status_code=400
+                    content=error_dict("Error downloading the image!"), status_code=400
                 )
         elif image_file:
             if len(image_file) == 0:
@@ -172,7 +180,14 @@ async def removebg(
                 content=error_dict("Error download image!"), status_code=400
             )
 
+    logger.debug(f"We are about to start!: {payload.json()}")
     job_id = ml_processor.job_create([parameters.dict(), image, bg, False])
+    dt = datetime.now()
+    ts = datetime.timestamp(dt)
+    dataset = {'job_id': str(job_id), 'image_name': str(
+        image_name), 'job_started': str(ts), 'status': 'in progress'}
+    req = requests.post(webhookurl, data=json.dumps(
+        dataset), headers={'Content-type': 'application/json'})
 
     while ml_processor.job_status(job_id) != "finished":
         if ml_processor.job_status(job_id) == "not_found":
@@ -182,8 +197,49 @@ async def removebg(
         time.sleep(5)
 
     result = ml_processor.job_result(job_id)
+    tempfile_response = None
+    if tumplate_auth_token:
+        url = "https://api.tumplate.com/api/auth/current-user"
+        payload = ""
+        headers = {
+        'Authorization': f"Bearer {tumplate_auth_token}",
+        'Cookie': 'XSRF-TOKEN=698bc426b305f8a21854b44c8871fc28xqOEGgCMQHnsaqcU9HYQl1HCmaxNwjsy1g2W8cOZ4EAZYOAqyxGptFZ%2B4ImG8fYr%2BLeDdS1MCUi4%2FLs3slaGdssZhxSmFUA1euB%2FliOtnzuQfcT9xmHbo8i%2ByoF3owB8; adonis-session=7188dc4f186116c9a8eb5f44a8b94295R1oPmqmP7EGe%2Fm%2B3q3eyWp6zlH%2F5q%2BTKGOpKpnescXmnklkeOZmYlHsikNsk67eQYa6F1zEDBKTnj7%2FQtCp5PIyfFVZ8ukDZmiYdhIPsl7gQ3vGIBjLpXijylINZO9MY; adonis-session-values=b51662b5d0b71390b91b256fdd1e0eab95yCOeFUWYSEXnkerxGAZ9ndW%2FLEt3We1pIvLtD%2Bkb3rIyW6jqEVYdz35tq486XQzDRab14mu1qwLel1XInXeQoZALbwrekylw0VW%2B04C3kMns2cXjn3L9GxrphmeBfrnyUYI4HDIMqupXdvUD2hBrFtQiJTZ5mftIVbD9eUOP0%3D'
+        }
+
+        tump_user_info = requests.request("GET", url, headers=headers, data=payload)
+        print(tump_user_info.text)
+    payload={}
+    files=[('file',(image_name,result,'image/png'))]
+    headers = {'Authorization': f"Bearer {tumplate_auth_token}"}
+    tempfile_response = requests.request("POST", tempfileurl, headers=headers, data=payload, files=files)
+
+    dataset = {'job_id': str(job_id), 'image_name': str(
+        image_name), 'job_started': str(ts), 'status': 'done!', 'tumplate_temp_id': str(tempfile_response)}
+    weready = requests.post(webhookurl, data=json.dumps(
+        dataset), headers={'Content-type': 'application/json'})
     return handle_response(result, image)
 
+@api_router.get("/hello")
+def caca():
+    """
+    Stub for compatibility with remove.bg api libraries
+    """
+    return JSONResponse(
+        content={
+            "data": {
+                "attributes": {
+                    "jaakko": {
+                        "test": 99999,
+                        "subscription": 99999,
+                        "payg": 99999,
+                        "moi": 99999,
+                    },
+                    "api": {"free_calls": 99999, "sizes": "all"},
+                }
+            }
+        },
+        status_code=200,
+    )
 
 @api_router.get("/account")
 def account():
@@ -218,5 +274,16 @@ def status(auth: str = Depends(Authenticate)):
             content=error_dict("Authentication failed"), status_code=403
         )
     resp = JSONResponse(content=config.json(), status_code=200)
+    resp.headers["X-Credits-Charged"] = "0"
+    return resp
+
+
+@api_router.get("/removebg")
+async def read_item(job_id: Union[str, None] = None):
+    if not job_id:
+        return JSONResponse(
+            content=error_dict("HEY HEY"), status_code=999
+        )
+    resp = JSONResponse({'id':job_id,'status': ml_processor.job_status(job_id)}, status_code=200)
     resp.headers["X-Credits-Charged"] = "0"
     return resp

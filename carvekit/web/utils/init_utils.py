@@ -1,9 +1,8 @@
 import warnings
 from os import getenv
 from typing import Union
-
+import requests
 from loguru import logger
-
 from carvekit.ml.wrap.cascadepsp import CascadePSP
 from carvekit.ml.wrap.isnet import ISNet
 from carvekit.ml.wrap.scene_classifier import SceneClassifier
