@@ -203,15 +203,13 @@ async def removebg(
         payload = ""
         headers = {
         'Authorization': f"Bearer {tumplate_auth_token}",
-        'Cookie': 'XSRF-TOKEN=698bc426b305f8a21854b44c8871fc28xqOEGgCMQHnsaqcU9HYQl1HCmaxNwjsy1g2W8cOZ4EAZYOAqyxGptFZ%2B4ImG8fYr%2BLeDdS1MCUi4%2FLs3slaGdssZhxSmFUA1euB%2FliOtnzuQfcT9xmHbo8i%2ByoF3owB8; adonis-session=7188dc4f186116c9a8eb5f44a8b94295R1oPmqmP7EGe%2Fm%2B3q3eyWp6zlH%2F5q%2BTKGOpKpnescXmnklkeOZmYlHsikNsk67eQYa6F1zEDBKTnj7%2FQtCp5PIyfFVZ8ukDZmiYdhIPsl7gQ3vGIBjLpXijylINZO9MY; adonis-session-values=b51662b5d0b71390b91b256fdd1e0eab95yCOeFUWYSEXnkerxGAZ9ndW%2FLEt3We1pIvLtD%2Bkb3rIyW6jqEVYdz35tq486XQzDRab14mu1qwLel1XInXeQoZALbwrekylw0VW%2B04C3kMns2cXjn3L9GxrphmeBfrnyUYI4HDIMqupXdvUD2hBrFtQiJTZ5mftIVbD9eUOP0%3D'
         }
-
         tump_user_info = requests.request("GET", url, headers=headers, data=payload)
         print(tump_user_info.text)
-    payload={}
-    files=[('file',(image_name,result,'image/png'))]
-    headers = {'Authorization': f"Bearer {tumplate_auth_token}"}
-    tempfile_response = requests.request("POST", tempfileurl, headers=headers, data=payload, files=files)
+        payload={}
+        files=[('file',(image_name,result,'image/png'))]
+        headers = {'Authorization': f"Bearer {tumplate_auth_token}"}
+        tempfile_response = requests.request("POST", tempfileurl, headers=headers, data=payload, files=files)
 
     dataset = {'job_id': str(job_id), 'image_name': str(
         image_name), 'job_started': str(ts), 'status': 'done!', 'tumplate_temp_id': str(tempfile_response)}
@@ -219,33 +217,10 @@ async def removebg(
         dataset), headers={'Content-type': 'application/json'})
     return handle_response(result, image)
 
-@api_router.get("/hello")
-def caca():
-    """
-    Stub for compatibility with remove.bg api libraries
-    """
-    return JSONResponse(
-        content={
-            "data": {
-                "attributes": {
-                    "jaakko": {
-                        "test": 99999,
-                        "subscription": 99999,
-                        "payg": 99999,
-                        "moi": 99999,
-                    },
-                    "api": {"free_calls": 99999, "sizes": "all"},
-                }
-            }
-        },
-        status_code=200,
-    )
 
 @api_router.get("/account")
 def account():
-    """
-    Stub for compatibility with remove.bg api libraries
-    """
+
     return JSONResponse(
         content={
             "data": {
@@ -281,9 +256,7 @@ def status(auth: str = Depends(Authenticate)):
 @api_router.get("/removebg")
 async def read_item(job_id: Union[str, None] = None):
     if not job_id:
-        return JSONResponse(
-            content=error_dict("HEY HEY"), status_code=999
-        )
+        return JSONResponse({'id':job_id,'status': ml_processor.job_status(job_id)}, status_code=200)
     resp = JSONResponse({'id':job_id,'status': ml_processor.job_status(job_id)}, status_code=200)
     resp.headers["X-Credits-Charged"] = "0"
     return resp
