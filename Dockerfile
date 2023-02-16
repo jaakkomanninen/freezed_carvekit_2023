@@ -59,4 +59,4 @@ ENV CARVEKIT_TRIMAP_EROSION=5
 EXPOSE 5000
 
 #CMD ["/bin/sh", "-c", "uvicorn carvekit.web.app:app --proxy-headers --host $CARVEKIT_HOST --port $PORT"]
-CMD ["uvicorn", "carvekit.web.app:app", "--proxy-headers", "--host", "$CARVEKIT_HOST", "--port", "$PORT"]
+CMD ["uvicorn", "carvekit.web.app:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "80"]
