@@ -1,4 +1,5 @@
 import secrets
+import os
 from typing import List
 from typing_extensions import Literal
 import torch.cuda
@@ -95,7 +96,7 @@ class MLConfig(BaseModel):
 class WebAPIConfig(BaseModel):
     """FastAPI app config"""
 
-    port: int = 5000
+    port: int(os.environ.get("PORT", 8080))
     """Web API port"""
     host: str = "0.0.0.0"
     """Web API host"""

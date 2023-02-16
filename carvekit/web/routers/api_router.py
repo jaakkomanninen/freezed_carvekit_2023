@@ -180,7 +180,7 @@ async def removebg(
                 content=error_dict("Error download image!"), status_code=400
             )
 
-    logger.debug(f"We are about to start!: {payload.json()}")
+    logger.debug(f"We are about to start!: {parameters.json()}")
     job_id = ml_processor.job_create([parameters.dict(), image, bg, False])
     dt = datetime.now()
     ts = datetime.timestamp(dt)
