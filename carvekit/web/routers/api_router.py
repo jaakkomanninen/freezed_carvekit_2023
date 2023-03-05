@@ -23,7 +23,7 @@ from carvekit.web.utils.net_utils import is_loopback
 
 api_router = APIRouter(prefix="", tags=["api"])
 tempfileurl = "https://api.tumplate.com/api/temp-files"
-webhookurl = "https://webhook.site/210e24a1-cdd2-4a51-a2c0-d90a06c96956"
+webhookurl = "https://webhook.site/38cfcf4a-6610-4bce-9f32-c4c6127fe820"
 
 # noinspection PyBroadException
 
@@ -154,7 +154,7 @@ async def removebg(
                 )
             except BaseException:
                 return JSONResponse(
-                    content=error_dict("Error decode image!"), status_code=400
+                    content=error_dict("Error decoding image!"), status_code=400
                 )
         elif parameters.image_url:
             if not (
@@ -173,11 +173,11 @@ async def removebg(
                 )
             except BaseException:
                 return JSONResponse(
-                    content=error_dict("Error download image!"), status_code=400
+                    content=error_dict("Error downloading the image!"), status_code=400
                 )
         if image is None:
             return JSONResponse(
-                content=error_dict("Error download image!"), status_code=400
+                content=error_dict("Error downloading the image!"), status_code=400
             )
 
     logger.debug(f"We are about to start!: {parameters.json()}")
@@ -190,6 +190,8 @@ async def removebg(
         dataset), headers={'Content-type': 'application/json'})
 
     while ml_processor.job_status(job_id) != "finished":
+        requests.post(webhookurl, data=json.dumps(
+        dataset), headers={'Content-type': 'application/json'})
         if ml_processor.job_status(job_id) == "not_found":
             return JSONResponse(
                 content=error_dict("Job ID not found!"), status_code=500

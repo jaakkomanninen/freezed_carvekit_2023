@@ -1,281 +1,750 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>
-<html lang="en" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>
-<html lang="en" class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>
-<html lang="en" class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html lang="en" class="no-js">
-<!--<![endif]-->
-
 <head>
-    <!-- meta charec set -->
-    <meta charset="utf-8">
-    <!-- Always force latest IE rendering engine or request Chrome Frame -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <!-- Page Title -->
-    <title>CarveKit</title>
-    <link rel="icon" href="img/icon.png" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/js/tailwind.js"></script>
+    <script src="/js/tailwind_plugins.js"></script>
 
-    <!-- Mobile Specific Meta -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tumppink: '#e278a6',
+                        tumplate: {
+                            100: '#cffafe',
+                            200: '#95eaef',
+                            300: '#52c3ff',
+                            400: '#35bdf9',
+                            500: '#35bdf9',
+                            600: '#00a0ff',
+                            700: '#1c7cd3',
+                            800: '#2454ce',
+                            900: '#2647b1',
+                        }
+                    }
+                }
+            }
+        }
+        function loaditems() {
+            localStorage.setItem("capturelist", JSON.stringify({ "capture_list": [] }));
+            console.log(JSON.parse(localStorage.getItem("capturelist")));
+            var myHeaders = new Headers();
+            var mytoken = localStorage.getItem('authToken');
+            myHeaders.append("Authorization", `Bearer ${mytoken}`);
+            myHeaders.append("Cookie", "XSRF-TOKEN=69037de74da7056731b2d70d05d607a86Qf4FL3Qiv8oDqyqCyy%2F%2ByE%2FcQwvKQGvJ6lngbIqmXEzipNZ4vscMwjLVJXXbVHk89jR47Z7amyREAARHk7K5%2BUWA9tBaOuCHJ6yRqzeA1sY8nex5ZQdJIBfM5Y3WYVv; adonis-session=f41c84d9b75400efcbfa33923b128887zzZi2tnw3DKSpJHTGRDoYDZJn3XxMirW4LW4B2oeG33ddExc96oR526Zup67o4oDmUHnLP04EWnB0OioMT4FN7EvmAfpmrev2f76nMQmAmHMSOAXIa%2F90SLfqU%2FECYGX; adonis-session-values=25772d766ed3610755463bf761bc04763iO8jXx7FllF7bhSAn7xD6x%2BwuoTyeF441OsfG0WS7oTGTI0XvU7jSr3GgqxfcIxZC0JoMLbX%2F%2BJGOBXQ%2BTa8p%2B9102XGLUXZ4f516xvEIU9sTPTse1fQbZT7PkYSQJ1NIQEYYIKykXzddMwqI8HszqQbinXqGi%2FaC3lR3XY0Jg%3D");
 
-    <!-- Google Font -->
+            var raw = "";
 
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800' rel='stylesheet' type='text/css'>
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js' rel='stylesheet' type='text/css'>
+            var requestOptions = {
+                method: 'GET',
+                headers: myHeaders,
+                redirect: 'follow'
+            };
 
-    <!-- CSS
-    ================================================== -->
-    <!-- Fontawesome Icon font -->
-    <link rel="stylesheet" href="css/font-awesome.min.css">
-    <!-- Twitter Bootstrap css -->
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <!-- jquery.fancybox  -->
-    <link rel="stylesheet" href="css/jquery.fancybox.css">
-    <!-- animate -->
-    <link rel="stylesheet" href="css/animate.css">
-    <!-- Main Stylesheet -->
-    <link rel="stylesheet" href="css/main.css">
-    <!-- media-queries -->
-    <link rel="stylesheet" href="css/media-queries.css">
-    <link rel="stylesheet" href="css/particles.css">
-    <!-- Modernizer Script for old Browsers -->
+            fetch("https://api.tumplate.com/api/video-drafts/33231/files?title=image_1", requestOptions)
+                .then(response => response.json())
+                .then(result => { localStorage.setItem('files', JSON.stringify(result)) })
+                .catch(error => console.log('error', error));
 
-    <script src="js/modernizr-2.6.2.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://use.fontawesome.com/releases/v5.7.2/css/all.css"></script>
+        }
+    </script>
+    <style>
+        #camera-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
+        #overlay-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.5;
+            object-fit: cover;
+            /* adjust opacity as needed */
+        }
+
+        #take-photo {
+            margin-top: 10px;
+        }
+
+        #captured-photo {
+            display: none;
+        }
+    </style>
 </head>
 
-<body id="body" class="">
-<div id="particles-js"></div>
-<!-- preloader -->
-<div id="preloader">
-
-    <img src="img/preloader.gif" alt="Preloader">
-</div>
-<!-- end preloader -->
-
-<!--
-Fixed Navigation
-==================================== -->
-
-<header id="navigation" class="navbar-fixed-top navbar">
-    <div class="container" style="padding-top: 10px; padding-bottom: 30px;">
-        <div class="navbar-header">
-            <!-- responsive nav button -->
-            <!--
-               <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                 <span class="sr-only">Toggle navigation</span>
-                 <i class="fa fa-bars fa-2x"></i>
-               </button>
-             -->
-            <!-- /responsive nav button -->
-
-        <!-- logo -->
-
-        <a class="navbar-brand " href="#body" style="padding: 5px">
-          <h1 id="logo">
-            <img src="img\CarveKit_logo_main.png" style="width: 230px; height: 40px; margin: 6pt;  " alt="logo-razres">
-          </h1>
-        </a>
-        <!-- /logo -->
+<body onload="loaditems()" class="p-4">
+    <div class="md:col-span-1">
+        <h3 id="modeheader" class="text-lg font-bold pb-2 leading-6 text-gray-900">Tumplate Product Image Capture</h3>
+        <p id="modeexplanation" class="mt-1 text-xs text-gray-500">Choose image overlay markers and position your photo.
+        </p>
+    </div>
+    <div id='apiinput' class="hidden block mt-4">
+        <label for="api" class="block text-sm font-medium text-gray-700">Input api key</label>
+        <div class="mt-1">
+            <input type="text" name="api" id="api"
+                class="block w-full rounded-md border-gray-300 mb-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                value="Tumplate2020">
+        </div>
+        <button type=" button" onclick="hideandsave()"
+            class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-teal-500 py-2 mb-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-tumplate-500 focus:ring-offset-2">Hide
+            and save</button>
+    </div>
+    <div class="bg-white px-4 py-5 sm:rounded-lg sm:p-6">
+        <div class="col-span-6 sm:col-span-3 pb-4">
+            <label for="camerapicker" class="block text-sm font-medium text-gray-700">Choose camera</label>
+            <select id="camerapicker" name="camerapicker"
+                class="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+                <option selected="true">Default camera</option>
+            </select>
         </div>
 
-        <!-- main nav -->
-        <!--
-              <nav class="collapse navbar-collapse navbar-dark bg-dark" role="navigation">
-              <ul id="nav" class="nav navbar-nav">
-                <li class="#tryBySelf" style="background:rgba(2, 19, 35, 0.7);"><a href="#tryBySelf">Попробуйте</a></li>
-                <li><a href="#features" style="background:rgba(2, 19, 35, 0.7);">Подробнее</a></li>
-                <li><a href="#contact" style="background:rgba(2, 19, 35, 0.7)">Обратная связь</a></li>
-              </ul>
-            </nav>
-      -->
-        <!-- /main nav -->
-
     </div>
-</header>
-<!--
-End Fixed Navigation
-==================================== -->
+    <div id="camera_view" width="100vw" height="100vw" style="width:420px;height:420px;position:relative;"
+        class="-ml-4 hidden">
+        <video id="camera-preview"></video>
+        <img id="overlay-image" src="img/generic.png">
+        <canvas id="captured-photo"></canvas>
+    </div>
+    <button type="button" id="zoom" onclick="hideandsave()"
+    class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-teal-500 py-2 mt-2 mb-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-tumplate-500 focus:ring-offset-2">Start preview mode</button>
+</div> </div>
+    <div
+    class="ml-3 inline-flex justify-center rounded-md border border-transparent py-2 mt-2 mb-2 px-4 text-xs font-medium text-gray-400 shadow-sm">Find the correct framing in preview mode. If image looks too wide, tap on preview button again. Once happy with the shot, tap on the image to open the phone's own camera app (for better image capture quality). Click zoom "x2" in actual camera mode. Also click [1:1] at the top of the image in case you don't see it. Remember to pick your input names before this.</div>
+</div>
+ <div class="my-12 min-w-full">
+        <p class="block text-xs font-medium text-gray-700">Name for this photo</p>
+        <textarea type="text" id="filetitle"
+            class="text-2xl w-full border-0 rounded-md mt-4 font-bold tracking-tight text-tumplate-600" value=""
+            placeholder="Please create the file name from options below."></textarea>
+    </div>
+    <form id="nameform">
+        <fieldset id="namegenerator" class="border rounded-md p-4 border-gray-200">
+            <legend class="mr-4 text-lg text-gray-500">Input the file name before taking the photo:</legend>
 
-<!--
-Top Section
-==================================== -->
-
-<section id="top" class="top">
-
-    <div class="parallax-overlay">
-
-        <div class="container">
-
-            <div class="row number-counters">
-                <div class="item" data-wow-duration="1000ms">
-                    <div class="caption text-center" data-wow-duration="1000ms">
-                        <h2 data-wow-duration="1ms" class="wow bounceInDown animated" style="color:white">
-                            Introducing<span style="color:white"> CarveKit</span>!</h2>
-                        <h3 data-wow-duration="1ms" class="wow slideInLeft animated" style="color:white"><span
-                                class="color">Background Removal</span> Tool</h3>
-                    </div>
+            <div id="variablelist" class="divide-y divide-gray-200">
+                <div class="col-span-6 sm:col-span-3 pb-4">
+                    <label for="prodgrp" class="block text-sm font-medium text-gray-700">Choose product
+                        group</label>
+                    <select id="prodgrp" name="prodgrp"
+                        class="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+                        <option selected="true" value="HOI">Choose from list</option>
+                        <option value="candle_fm">Full moon in...</option>
+                        <option value="candle_nm">New moon in...</option>
+                        <option value="candle_magic">Magic Candles</option>
+                        <option value="candle_solar">Solar Return Candles</option>
+                        <option value="candle_merc">Retrograde Candles</option>
+                        <option value="spray">Sprays</option>
+                        <option value="incense">Incense</option>
+                        <option value="bath">Bath products</option>
+                        <option value="">No category</option>
+                    </select>
+                </div>
+                <div class="col-span-6 sm:col-span-3 pb-4">
+                    <label for="custom_pre" class="block text-sm font-medium text-gray-700">Choose custom
+                        identifier</label>
+                    <select id="custom_pre" name="custom_pre"
+                        class="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+                        <option selected="true" value="">Just custom field:</option>
+                        <option value="cap">Capricorn</option>
+                        <option value="aqu">Aquarius</option>
+                        <option value="pis">Pisces</option>
+                        <option value="ari">Aries</option>
+                        <option value="tau">Taurus</option>
+                        <option value="gem">Gemini</option>
+                        <option value="can">Cancer</option>
+                        <option value="leo">Leo</option>
+                        <option value="vir">Virgo</option>
+                        <option value="lib">Libra</option>
+                        <option value="sco">Scorpio</option>
+                        <option value="sag">Sagittarius</option>
+                    </select>
+                </div>
+                <div class="col-span-6 sm:col-span-3 pb-4">
+                    <label for="imgtype" class="block text-sm font-medium text-gray-700">Choose Image type</label>
+                    <select id="imgtype" name="imgtype"
+                        class="mt-1 block w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+                        <option selected="true" value="front">Main/front</option>
+                        <option value="label">Label</option>
+                        <option value="top">Top</option>
+                        <option value="instructions">Instructions</option>
+                    </select>
+                </div>
+               <div id='custtxt' class="block mt-4">
+                <label for="cust" class="block text-sm font-medium text-gray-700">Custom name input</label>
+                <div class="mt-1">
+                    <input type="text" name="cust" id="cust"
+                        class="block w-full p-4 rounded-md border-gray-300 mb-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="Input custom name here or leave blank">
                 </div>
             </div>
+            </div>
+        </fieldset>
+    </form>
+
+
+
+
+
+    <label for="cameraFileInput">
+        <span
+            class="w-full min-w-full justify-center rounded-md border border-transparent bg-teal-500 py-6 mb-8 px-24 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-tumplate-500 focus:ring-offset-2">Open
+            camera</span>
+
+        <!-- The hidden file `input` for opening the native camera -->
+        <input id="cameraFileInput" type="file" accept="image/*" capture="environment" class="hidden block m-4" />
+    </label>
+
+    <!-- displays the picture uploaded from the native camera -->
+    <img id="pictureFromCamera" />
+
+    <div class="bg-white">
+        <div class="my-12 min-w-full">
+            <h2 class="text-lg mt-4 font-bold tracking-tight text-gray-900">Your generated files will be listed
+                below.
+            </h2>
+
+            <a href="#" class="block hover:bg-gray-50">
+                <div id="outputs" class="block">
+
+                </div>
         </div>
+        </a>
     </div>
 
+    <p id="txt"></p>
+    <p id="logger" class="text-xs"></p>
 
-</section>
+    <script>
+        function processClick() {
+            var myfile = document.getElementById('filetitle');
+            if (myfile.value) { document.getElementById("cameraFileInput").click() }
+            else {
+                document.getElementById('namegenerator').classList.remove('border-grey-200');
+                document.getElementById('namegenerator').classList.add('border-tumplate-600');
+                alert("Don't forget to enter the productname");
+                return true
+            }
+        }
+        document.getElementById("cameraFileInput").addEventListener("change", function () {
+            const capturedImage = new Image();
+            console.log(this.files[0]);
+            capturedImage.src = window.URL.createObjectURL(this.files[0]);
+            capturedImage.onload = function () {
+                // Create a canvas element to draw the image onto
+                const canvas = document.createElement('canvas');
+                canvas.width = capturedImage.width;
+                canvas.height = capturedImage.height;
+                const context = canvas.getContext('2d');
+                context.drawImage(capturedImage, 0, 0, capturedImage.width, capturedImage.height);
 
-<!--
-End Top Section
-==================================== -->
+                // Convert the canvas to a JPEG Blob and display it
+                canvas.toBlob(function (jpegBlob) {
+                    // Do something with the JPEG Blob, e.g. upload to server
+                }, 'image/jpeg', 1);
+            };
+            var dataUrl = window.URL.createObjectURL(this.files[0]);
+            var inputtime = new Date();
+            var newEntry = { "captureName": document.getElementById('filetitle').value == "" ? inputtime.valueOf() : document.getElementById('filetitle').value, "renderStart": inputtime.valueOf(), "status": "pending", "downloadURL": null };
+            capturelist.capture_list.push(newEntry);
+            localStorage.setItem('capturelist', JSON.stringify(capturelist));
+            sendFile(dataUrl, newEntry);
+            var outputlist = document.getElementById('outputs');
+            var captureDiv = document.createElement('div');
+            captureDiv.setAttribute('class', "w-full block");
+            captureDiv.id = String(newEntry.captureName);
+            outputlist.appendChild(captureDiv);
+            let div2 = document.createElement('div');
+            div2.id = `${String(newEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_row`;
+            div2.setAttribute('class', "relative flex justify-start rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-gray-400")
+            captureDiv.appendChild(div2);
+            var entrytitle = document.createElement('div');
+            entrytitle.id = `${String(newEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_title`;
+            entrytitle.setAttribute('class', "text-md font-medium p-2 text-gray-900");
+            entrytitle.innerHTML = `<p>${newEntry.captureName}</p>`;
+            div2.appendChild(entrytitle);
+            var entrystatus = document.createElement('div');
+            entrystatus.id = `${String(newEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_status`;
+            entrystatus.setAttribute('class', "text-sm font-medium p-2 text-gray-900");
+            entrystatus.innerHTML = `<p class="text-xs">Status</p><p class="text-sm text-grey-300">${newEntry.status}</p>`;
+            div2.appendChild(entrystatus);
+            let div3 = document.createElement('div');
+            div3.setAttribute('class', "flex-shrink-0")
+            div2.appendChild(div3);
+
+            var capt = document.createElement('img');
+            capt.setAttribute('class', "h-20 w-20 object-cover rounded-md");
+            capt.id = `${String(newEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_raw`;
+            capt.style.display = "block";
+            capt.setAttribute('src', dataUrl);
+            div3.appendChild(capt);
+            let div4 = document.createElement('div');
+            div4.setAttribute('class', "min-w-0  flex-1")
+            div2.appendChild(div4);
+
+        }
+        );
 
 
-<!--
-Try yourself
-==================================== -->
+        function move(array, from, to) {
+            if (to === from) return array;
 
+            var target = array[from];
+            var increment = to < from ? -1 : 1;
 
-<section id="tryBySelf" class="tryBySelf">
+            for (var k = from; k != to; k += increment) {
+                array[k] = array[k + increment];
+            }
+            array[to] = target;
+            return array;
+        }
+        document.getElementById('nameform').addEventListener('change', (k) => { updateName(k) });
+        document.getElementById('cust').addEventListener('input', (k) => { updateName(k) });
+        const overlayArray = ['img/generic.png', 'img/short.png', 'img/tall.png', 'img/off.png'];
+        function updateName(e) {
+            console.log(e);
+            var formEl = document.forms.nameform;
+            var formData = new FormData(formEl);
+            var overlayindx = document.getElementById('prodgrp').selectedIndex;
 
-    <div class="container text-center" style="width: 100%; ">
-        <div style="    backdrop-filter: blur(1px);
-        padding: 32px;
-        border-radius: 20px;
-    width: fit-content;
-    position: relative;
-    margin: auto;">
-        <div class="row">
+            var opts = [3, 2, 1, 2, 2, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0];
+            var curOverlay = [0, 0,0,0,0,0,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            document.getElementById("overlay-image").src = overlayArray[curOverlay[document.getElementById('prodgrp').selectedIndex]];
+            var tempname = [];
+            for (const value of formData.values()) {
+                if (value != "") {
+                    tempname.push(value);
+                }
 
-            <div class="sec-title text-center mb50 wow bounceInDown animated" data-wow-duration="500ms">
-                <h2>Try yourself</h2>
-                <div class="devider"><i class="fa fa-heart-o fa-lg"></i></div>
-            </div>
+            };
+            if ((!document.getElementById('cust').value == "") && (!document.getElementById('prodgrp').value == "")) {
+                move(tempname, 0, 1)
+            };
+            document.getElementById('filetitle').value = tempname.join("_");
+        }
 
+        var capturelist = { 'capture_list': [] };
 
-            <div class="form-container">
-                <form id="image_form" name="image_form"  enctype="multipart/form-data" method="POST">
+        document.getElementById('api').value = localStorage.getItem('carveapi');
+        const cameraPreview = document.getElementById('camera-preview');
+        const overlayImage = document.getElementById('overlay-image');
 
-                    <div class="panel-container">
-                        <img id="image_preview" src="" style="max-width: 100vw; max-height: 70vh">
-                        <div class="img-cont" style="flex-direction: column;">
-                          <div class="fileupload fileupload-new" data-provides="fileupload">
-                            <span class="btn btn-primary btn-file"><span class="fileupload-new">Choose file</span>
-                            <span class="fileupload-exists">Choose other</span>         <input name="image_file"    type="file" /></span>
-                            <span class="fileupload-preview"></span>
-                            <a href="#" class="close fileupload-exists" data-dismiss="fileupload" style="float: none">×</a>
-                          </div>
-                          <input class="form-input"  style="z-index: 0" id="token"  placeholder="API token">
+        const capturedPhoto = document.getElementById('captured-photo');
+        const ctx = capturedPhoto.getContext('2d');
+        overlayImage.addEventListener('click', processClick);
 
+        if (!navigator.mediaDevices?.enumerateDevices) {
+            console.log("enumerateDevices() not supported.");
+        } else {
+            // List cameras and microphones.
+            navigator.mediaDevices.enumerateDevices()
+                .then((devices) => {
 
-                            <button class="btn btn-primary" style="z-index: 0;
-margin-top: 16px" id="butn" type="submit"><i class="fa fa-download">
-                    </i> Remove background
-                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                    devices.forEach(device => {
+                        if (device.kind === 'videoinput') {
+                            const option = document.createElement('option');
+                            option.value = device.deviceId;
+                            option.text = device.label || `Camera ${selectElement.length + 1}`;
+                            selectElement.add(option);
+                        }
+                    });
 
-                    </button>
-                        </div>
-                    </div>
+                })
+                .catch((err) => {
+                    console.error(`${err.name}: ${err.message}`);
+                });
+        };
 
+        const selectElement = document.getElementById('camerapicker');
+        const zoomPicker = document.getElementById('zoom');
+        var constraints = {
+            aspectRatio: 1,
+            facingMode: "environment",
+            width: { min: 640, ideal: 1536 },
+            height: { min: 640, ideal: 2048 },
+            resizeMode: "crop",
+            advanced: [
+                { width: 1536, height: 2048 },
+                { aspectRatio: 1 },
+                { zoom: 3 }
+            ]
+        };
 
-                </form>
-            </div>
-        </div>
-            </div>
-    </div>
-</section>
+        var constraints2 = {
+            aspectRatio: 1,
+            facingMode: "environment",
+            width: { min: 640, ideal: 2048 },
+            height: { min: 640, ideal: 1536 },
+            resizeMode: "crop",
+            advanced: [
+                { width: 2048, height: 1536 },
+                { aspectRatio: 1 },
+                { zoom: 3 }
+            ]
+        };
 
-<!--
-End Try yourself
-==================================== -->
+        zoomPicker.addEventListener('click', event => {
+          document.getElementById("camera_view").setAttribute('class',"-ml-4");
 
-
-<!--
-End Contact Us
-==================================== -->
-
-
-<footer id="footer" class="footer">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <p class="text-center">
-                    Copyright © 2022 <a href="https://github.com/OPHoperHPO/image-background-remove-tool">CarveKit</a>. All rights reserved.
-                </p>
-            </div>
-        </div>
-    </div>
-</footer>
-
-<a href="javascript:void(0);" id="back-top"><i class="fa fa-angle-up fa-3x"></i></a>
-
-<!-- Essential jQuery Plugins
-================================================== -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
-<!-- Main jQuery -->
-<script src="js/jquery-1.11.1.min.js"></script>
-<!-- Single Page Nav -->
-<script src="js/jquery.singlePageNav.min.js"></script>
-<!-- Twitter Bootstrap -->
-<script src="js/bootstrap.min.js"></script>
-<!-- jquery.fancybox.pack -->
-<script src="js/jquery.fancybox.pack.js"></script>
-<!-- jquery.mixitup.min -->
-<script src="js/jquery.mixitup.min.js"></script>
-<!-- jquery.parallax -->
-<script src="js/jquery.parallax-1.1.3.js"></script>
-<!-- jquery.countTo -->
-<script src="js/jquery-countTo.js"></script>
-<!-- jquery.appear -->
-<script src="js/jquery.appear.js"></script>
-<!-- Contact form validation -->
-<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.32/jquery.form.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.11.1/jquery.validate.min.js"></script>
-<!-- Google Map -->
-<script type="text/javascript"
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcABaamniA6OL5YvYSpB3pFMNrXwXnLwU&libraries=places"></script>
-<!-- jquery easing -->
-<script src="js/jquery.easing.min.js"></script>
-<!-- jquery easing -->
-<script src="js/wow.min.js"></script>
-    <script src='https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js'></script>
-    <script  src="js/particles.js"></script>
-<script>
-    var wow = new WOW({
-        boxClass: 'wow', // animated element css class (default is wow)
-        animateClass: 'animated', // animation css class (default is animated)
-        offset: 120, // distance to the element when triggering the animation (default is 0)
-        mobile: false, // trigger animations on mobile devices (default is true)
-        live: true // act on asynchronously loaded content (default is true)
-    });
-    wow.init();
-    !function(e){var t=function(t,n){this.$element=e(t),this.type=this.$element.data("uploadtype")||(this.$element.find(".thumbnail").length>0?"image":"file"),this.$input=this.$element.find(":file");if(this.$input.length===0)return;this.name=this.$input.attr("name")||n.name,this.$hidden=this.$element.find('input[type=hidden][name="'+this.name+'"]'),this.$hidden.length===0&&(this.$hidden=e('<input type="hidden" />'),this.$element.prepend(this.$hidden)),this.$preview=this.$element.find(".fileupload-preview");var r=this.$preview.css("height");this.$preview.css("display")!="inline"&&r!="0px"&&r!="none"&&this.$preview.css("line-height",r),this.original={exists:this.$element.hasClass("fileupload-exists"),preview:this.$preview.html(),hiddenVal:this.$hidden.val()},this.$remove=this.$element.find('[data-dismiss="fileupload"]'),this.$element.find('[data-trigger="fileupload"]').on("click.fileupload",e.proxy(this.trigger,this)),this.listen()};t.prototype={listen:function(){this.$input.on("change.fileupload",e.proxy(this.change,this)),e(this.$input[0].form).on("reset.fileupload",e.proxy(this.reset,this)),this.$remove&&this.$remove.on("click.fileupload",e.proxy(this.clear,this))},change:function(e,t){if(t==="clear")return;var n=e.target.files!==undefined?e.target.files[0]:e.target.value?{name:e.target.value.replace(/^.+\\/,"")}:null;if(!n){this.clear();return}this.$hidden.val(""),this.$hidden.attr("name",""),this.$input.attr("name",this.name);if(this.type==="image"&&this.$preview.length>0&&(typeof n.type!="undefined"?n.type.match("image.*"):n.name.match(/\.(gif|png|jpe?g)$/i))&&typeof FileReader!="undefined"){var r=new FileReader,i=this.$preview,s=this.$element;r.onload=function(e){i.html('<img src="'+e.target.result+'" '+(i.css("max-height")!="none"?'style="max-height: '+i.css("max-height")+';"':"")+" />"),s.addClass("fileupload-exists").removeClass("fileupload-new")},r.readAsDataURL(n)}else this.$preview.text(n.name),this.$element.addClass("fileupload-exists").removeClass("fileupload-new")},clear:function(e){this.$hidden.val(""),this.$hidden.attr("name",this.name),this.$input.attr("name","");if(navigator.userAgent.match(/msie/i)){var t=this.$input.clone(!0);this.$input.after(t),this.$input.remove(),this.$input=t}else this.$input.val("");this.$preview.html(""),this.$element.addClass("fileupload-new").removeClass("fileupload-exists"),e&&(this.$input.trigger("change",["clear"]),e.preventDefault())},reset:function(e){this.clear(),this.$hidden.val(this.original.hiddenVal),this.$preview.html(this.original.preview),this.original.exists?this.$element.addClass("fileupload-exists").removeClass("fileupload-new"):this.$element.addClass("fileupload-new").removeClass("fileupload-exists")},trigger:function(e){this.$input.trigger("click"),e.preventDefault()}},e.fn.fileupload=function(n){return this.each(function(){var r=e(this),i=r.data("fileupload");i||r.data("fileupload",i=new t(this,n)),typeof n=="string"&&i[n]()})},e.fn.fileupload.Constructor=t,e(document).on("click.fileupload.data-api",'[data-provides="fileupload"]',function(t){var n=e(this);if(n.data("fileupload"))return;n.fileupload(n.data());var r=e(t.target).closest('[data-dismiss="fileupload"],[data-trigger="fileupload"]');r.length>0&&(r.trigger("click.fileupload"),t.preventDefault())})}(window.jQuery)
-
-</script>
-<!-- Custom Functions -->
-<script src="js/custom.js"></script>
-
-<script type="text/javascript">
-    document.getElementById("image_form").addEventListener("submit", async (event) => {
-        console.log(event)
-        event.preventDefault()
-        let formdata = new FormData(event.target)
-        console.log(formdata)
-        const response = await fetch("/api/removebg", {
-            method: 'POST',
-            headers: new Headers({
-                'X-API-Key': document.getElementById("token").value
-            }),
-            body: formdata
+            constraints2.advanced.zoom = 3;
+            navigator.mediaDevices.getUserMedia({ video: constraints2 })
+                .then(stream => {
+                    cameraPreview.srcObject = stream;
+                    console.log(cameraPreview.srcObject);
+                    cameraPreview.play();
+                    console.log('zoom changed to ' + (Number(zoomPicker.selectedIndex) + 1))
+                })
+                .catch(error => {
+                    console.error('Error accessing media stream:', error);
+                });
         });
-        const image_blob = await response.blob()
-        imageurl = URL.createObjectURL(image_blob)
-        document.getElementById("image_preview").src = imageurl
-    })
-</script>
-</body>
 
-</html>
+        selectElement.addEventListener('change', event => {
+            constraints2.advanced.zoom = Number(zoomPicker.selectedIndex) + 1;
+            const selectedDeviceId = event.target.value;
+            constraints2.deviceId = selectedDeviceId;
+            navigator.mediaDevices.getUserMedia({ video: constraints2 })
+                .then(stream => {
+                    cameraPreview.srcObject = stream;
+                    console.log(cameraPreview.srcObject);
+                    cameraPreview.play();
+                })
+                .catch(error => {
+                    console.error('Error accessing media stream:', error);
+                });
+        });
+        // getUserMedia() is used to access the camera
+
+
+        function getCameraData() {
+            document.getElementById('')
+        }
+
+
+        function processImage(kuva) {
+            let canvas = document.createElement('canvas');
+            let ctx = canvas.getContext('2d');
+
+            console.log('processing image')
+            console.log(kuva);
+            console.log(kuva.width);
+            console.log(kuva.height);
+            canvas.width = kuva.height;
+            canvas.height = kuva.width;
+            // Rotate the image if it is wider than tall
+            if (kuva.width <= kuva.height) {
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(Math.PI / 2);
+                ctx.drawImage(kuva, -kuva.width / 2, -kuva.height / 2);
+            } else {
+                canvas.width = kuva.width;
+                canvas.height = kuva.height;
+                ctx.drawImage(kuva, 0, 0);
+            }
+
+            // Trim away excess transparent pixels
+            let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            let pixels = imageData.data;
+            let width = imageData.width;
+            let height = imageData.height;
+            let x, y, i, found;
+
+            // Trim transparent pixels from top
+            found = false;
+            for (y = 0; y < height; y++) {
+                for (x = 0; x < width; x++) {
+                    i = (y * width + x) * 4 + 3; // Alpha channel index
+                    if (pixels[i] > 0) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+            let top = y;
+
+            // Trim transparent pixels from bottom
+            found = false;
+            for (y = height - 1; y >= 0; y--) {
+                for (x = 0; x < width; x++) {
+                    i = (y * width + x) * 4 + 3; // Alpha channel index
+                    if (pixels[i] > 0) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+            let bottom = y;
+
+            // Trim transparent pixels from left
+            found = false;
+            for (x = 0; x < width; x++) {
+                for (y = 0; y < height; y++) {
+                    i = (y * width + x) * 4 + 3; // Alpha channel index
+                    if (pixels[i] > 0) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+            let left = x;
+
+            // Trim transparent pixels from right
+            found = false;
+            for (x = width - 1; x >= 0; x--) {
+                for (y = 0; y < height; y++) {
+                    i = (y * width + x) * 4 + 3; // Alpha channel index
+                    if (pixels[i] > 0) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+            let right = x;
+
+            // Crop image to non-transparent area
+            let croppedWidth = right - left + 1;
+            let croppedHeight = bottom - top + 1;
+            let croppedCanvas = document.createElement('canvas');
+            let croppedCtx = croppedCanvas.getContext('2d');
+            croppedCanvas.width = croppedWidth;
+            croppedCanvas.height = croppedHeight;
+            croppedCtx.drawImage(canvas, left, top, croppedWidth, croppedHeight, 0, 0, croppedWidth, croppedHeight);
+
+            let scaleFactor = 1;
+            if (croppedCanvas.height > 2048) {
+                scaleFactor = 2048 / croppedCanvas.height;
+            }
+            let scaledWidth = croppedCanvas.width * scaleFactor;
+            let scaledHeight = croppedCanvas.height * scaleFactor;
+            let scaledCanvas = document.createElement('canvas');
+            let scaledCtx = scaledCanvas.getContext('2d');
+            scaledCanvas.width = scaledWidth;
+            scaledCanvas.height = scaledHeight;
+            scaledCtx.drawImage(croppedCanvas, 0, 0, croppedCanvas.width, croppedCanvas.height, 0, 0, scaledWidth, scaledHeight);
+
+            // Return the scaled image data
+            return scaledCanvas.toDataURL('image/png', 1)
+        };
+
+        function sendFile(fileString, newEntry) {
+            console.log(newEntry);
+            var myEntry = newEntry;
+
+            var apikey = "Tumplate2020";
+            if (apikey == "") { apikey = "Tumplate2020"; };
+            var thisStatus = document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_status`);
+            var returnHere = document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_row`);
+            if (localStorage.getItem('capturelist')) {
+                capturelist = JSON.parse(localStorage.getItem('capturelist'));
+            }
+
+
+            var myHeaders = new Headers();
+            myHeaders.append("X-API-Key", apikey);
+            myHeaders.append("Authorization", `Bearer ${apikey}`);
+
+            fetch(fileString)
+                .then(res => res.blob())
+                .then(blob => {
+                    var outputFile = blob;
+                    console.log(blob);
+
+                    console.log(outputFile);
+                    var formdata = new FormData();
+                    formdata.append("crop", true);
+                    formdata.append("image_name", String(myEntry.captureName));
+                    formdata.append("crop_margin", "5px");
+                    console.log(formdata);
+                    formdata.append("image_file", outputFile, `${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}`);
+
+                    var requestOptions = {
+                        method: 'POST',
+                        headers: myHeaders,
+                        body: formdata,
+                        redirect: 'follow'
+                    };
+                    console.log('key started with api key: ' + apikey);
+                    document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_status`).innerHTML = `<p class="text-xs">Status</p><p class="text-xs text-tumplate-600">Sent to AI engine</p>`;
+                    document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_status`).onclick = "logg('refresh function coming up')"
+                    fetch("/api/removebg", requestOptions)
+                        .then(response => response.blob())
+                        .then(blob => {
+                            if (blob.type == 'image/png') {
+                                console.log('blob type is' + blob.type)
+                                // create a new image element
+                                const keyedimg = new Image();
+                                keyedimg.onload = () => {
+                                    // call the processImage function with the image element
+                                    const processedData = processImage(keyedimg);
+                                    console.log(processedData);
+                                };
+                                // set the image source to the blob data
+                                var objectUrl = URL.createObjectURL(blob);
+                                keyedimg.src = objectUrl;
+
+
+                                var forwardThis = blob;
+                                var keyedForm = new FormData();
+                                var tumpToken = localStorage.getItem('authToken');
+                                var myHeaders2 = new Headers();
+                                myEntry.downloadURL = objectUrl;
+                                myEntry.status = 'ready';
+                                let div3 = document.createElement('div');
+                                div3.setAttribute('class', "flex-shrink-0")
+                                document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_row`).appendChild(div3);
+                                // Create an <img> element and set its source to the object URL
+                                var img = document.createElement('img');
+                                img.setAttribute('class', "h-20 w-20 object-cover rounded-md");
+                                img.src = objectUrl;
+
+                                // Append the <img> element to the document
+                                div3.appendChild(img);
+                                document.getElementById(`${String(newEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_raw`).remove();
+
+                                // Create a link with the object URL and set its download attribute
+                                var link = document.createElement('a');
+                                link.href = objectUrl;
+                                link.setAttribute('class', "ml-3 inline-flex justify-center rounded-md border border-transparent bg-teal-500 py-2 mb-2 px-4 text-xs font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-tumplate-500 focus:ring-offset-2")
+                                link.download = `${myEntry.captureName}.png`;
+                                link.innerHTML = `Download`;
+                                document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_status`).innerHTML = `<p class="text-xs">Status</p><p class="text-xs text-green-400">Success (${new Date().toLocaleTimeString()})</p>`
+                                // Append the link to the document
+                                document.getElementById(`${String(newEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_row`).appendChild(link);
+
+                                var myHeaders2 = new Headers();
+
+                                myHeaders2.append("Authorization", `Bearer ${tumpToken}`);
+
+                                var formdatax = new FormData();
+                                formdatax.append("file", forwardThis, `${myEntry.captureName}.png`);
+
+                                var requestOptions2 = {
+                                    method: 'POST',
+                                    headers: myHeaders2,
+                                    body: formdatax,
+                                    redirect: 'follow'
+                                };
+
+                                fetch("https://api.tumplate.com/api/temp-files", requestOptions2)
+                                    .then(response => response.json())
+                                    .then(result => {
+                                        console.log(result)
+                                        var tempid = result.id;
+                                        console.log('lets do a draft with this' + result.id);
+                                        console.log('file name is still: '+myEntry.captureName)
+
+                                        var raw = JSON.stringify({
+                                            "draft_id": 33231,
+                                            "file_id": result.id,
+                                            "title": "image_1",
+                                            "is_original": 1,
+                                            "params": "{\"isGlobalColor\":true,\"tintColor\":1,\"tint\":1,\"refId\":\"image_2\",\"rotate\":0,\"tempId\":null,\"scale\":1,\"use_original\":0,\"is_disabled\":0}"
+                                        });
+
+
+                                        var myHeaders3 = new Headers();
+                                        myHeaders3.append("Authorization", `Bearer ${tumpToken}`);
+                                        myHeaders3.append("Content-Type", "application/json");
+
+                                        var requestOptions3 = {
+                                            method: 'POST',
+                                            headers: myHeaders3,
+                                            body: raw,
+                                            redirect: 'follow'
+                                        };
+
+                                        var requestOptions4 = {
+                                            method: 'POST',
+                                            headers: myHeaders3,
+                                            redirect: 'follow'
+                                        };
+
+                                        fetch("https://api.tumplate.com/api/video-drafts/33231/files/", requestOptions3)
+                                            .then(response => response.json())
+                                            .then(result => {
+                                                console.log(result);
+
+                                                fetch(`https://api.tumplate.com/api/videos?title=${myEntry.captureName}&type=5&draft_id=33231`, requestOptions3)
+                                                    .then(response => response.json())
+                                                    .then(result => {
+                                                        console.log(result)
+
+                                                    });
+                                            });
+
+                                    }
+                                    )
+                                    .catch(error => console.log('error', error));
+
+
+                            } else {
+                                document.getElementById(`${String(newEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}`).remove();
+                                revealAPI()
+                            };
+                        })
+                        .catch(error => { console.log('error', error); revealAPI(); });
+                })
+        };
+
+        function revealAPI() {
+            document.getElementById('apiinput').setAttribute('class', 'block');
+            document.getElementById('api').value = localStorage.getItem('carveapi');
+        }
+
+        function hideandsave() {
+            localStorage.setItem('carveapi', document.getElementById('api').value);
+            console.log(localStorage.getItem('carveapi'));
+            document.getElementById('apiinput').setAttribute('class', 'hidden');
+
+        };
+
+
+        const serverAddress = "https://api.tumplate.com";
+        async function getTumplateTokenDynamic(userData) {
+            var requestOptions = {
+                "method": 'POST',
+                "headers": { 'Content-Type': 'application/json' },
+                "body": JSON.stringify(userData),
+                "redirect": 'follow'
+            };
+            await fetch(serverAddress + "/api/auth/login", requestOptions)
+                .then((response) => response.json())
+                .then((dataa) => {
+                    console.log(dataa)
+
+                    localStorage.setItem('bulkToken', JSON.stringify(dataa));
+                    console.log('superadmin found:' + dataa.user.first_name);
+
+                    console.log('test account login: ' + dataa.user.username);
+                    localStorage.setItem('baseToken', JSON.stringify(dataa));
+
+                    return dataa
+                });
+        };
+
+
+        function logg(mystring = 'text') {
+            if (typeof mystring == 'object') {
+                mystring = JSON.stringify(mystring);
+            };
+            var d = new Date();
+            var n = d.toLocaleTimeString();
+            var mylog = document.getElementById('logger');
+            let temp = mylog.innerHTML;
+            mylog.innerHTML = "(" + n + ") " + mystring + '\r' + temp;
+        }
+
+
+    </script>
+</body>

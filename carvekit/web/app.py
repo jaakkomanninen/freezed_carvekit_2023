@@ -9,7 +9,7 @@ from carvekit import version
 from carvekit.web.deps import config
 from carvekit.web.routers.api_router import api_router
 
-app = FastAPI(title="CarveKit Web API", version=version)
+app = FastAPI(title="Tumplate Web API", version=version)
 
 app.add_middleware(
     CORSMiddleware,

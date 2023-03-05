@@ -96,7 +96,7 @@ class MLConfig(BaseModel):
 class WebAPIConfig(BaseModel):
     """FastAPI app config"""
 
-    port: int = 5000
+    port: int = 8080
     """Web API port"""
     host: str = "0.0.0.0"
     """Web API host"""

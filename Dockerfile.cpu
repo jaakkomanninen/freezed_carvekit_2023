@@ -1,5 +1,5 @@
 FROM python:3.10.4 as builder
-WORKDIR /app
+WORKDIR /
 
 # Models download stage
 RUN pip3 install --no-cache-dir tqdm==4.64.0 requests==2.27.1
@@ -15,7 +15,7 @@ RUN python3 -c "from carvekit.ml.files.models_loc import download_all; download_
 RUN rm -rf ./carvekit
 
 FROM python:3.10.4
-WORKDIR /app
+WORKDIR /
 
 RUN apt-get update && apt-get -y install libgl1  # Install cv2 dep.
 COPY --from=builder /root/.cache/carvekit /root/.cache/carvekit
@@ -31,8 +31,8 @@ COPY ./ ./
 
 # Install to site-packages to make possible run tests and process images by cli
 RUN pip3 install -e ./
-ENV PYTHONUNBUFFERED True
-ENV CARVEKIT_PORT '5000'
+
+ENV CARVEKIT_PORT '8080'
 ENV CARVEKIT_HOST '0.0.0.0'
 ENV CARVEKIT_SEGMENTATION_NETWORK 'tracer_b7'
 ENV CARVEKIT_PREPROCESSING_METHOD 'none'
@@ -53,10 +53,9 @@ ENV CARVEKIT_TRIMAP_EROSION=5
 
 # Tokens will be generated automatically every time the container is restarted if ENV is not set.
 
-# ENV CARVEKIT_ADMIN_TOKEN 'admin_token' # Do not use this env when creating an image as it is not safe.
+ENV CARVEKIT_ADMIN_TOKEN 'Tumplate2020'
 # ENV CARVEKIT_ALLOWED_TOKENS 'test_token1,test_token2' # Do not use this env when creating an image as it is not safe.
 
-EXPOSE 5000
+EXPOSE 8080
 
-#CMD ["/bin/sh", "-c", "uvicorn carvekit.web.app:app --proxy-headers --host $CARVEKIT_HOST --port $PORT"]
-CMD ["uvicorn", "carvekit.web.app:app", "--proxy-headers", "--host", "$CARVEKIT_HOST", "--port", "$PORT"]
+CMD ["/bin/sh", "-c", "uvicorn carvekit.web.app:app --host 0.0.0.0 --port 8080"]

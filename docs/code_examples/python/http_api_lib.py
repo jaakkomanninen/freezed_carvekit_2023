@@ -8,7 +8,7 @@ License: Apache License 2.0
 import remove_bg_api
 from pathlib import Path
 
-remove_bg_api.API_URL = "http://localhost:5000/api"  # Change the endpoint url
+remove_bg_api.API_URL = "http://localhost:80/api"  # Change the endpoint url
 removebg = remove_bg_api.RemoveBg("test")
 
 settings = {  # API settings. See https://www.remove.bg/api for more details.

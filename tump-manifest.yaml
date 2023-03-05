@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tumplateaiapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tumplateaiapi
+  template:
+    metadata:
+      labels:
+        app: tumplateaiapi
+    spec:
+      containers:
+        - name: my-container
+          image: my-registry/my-image:my-tag
+          ports:
+            - containerPort: 8080
+          command: ["/bin/sh", "-c"]
+          args: ["uvicorn carvekit.web.app:app --host 0.0.0.0 --port 8080"]

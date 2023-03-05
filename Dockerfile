@@ -31,8 +31,8 @@ COPY ./ ./
 
 # Install to site-packages to make possible run tests and process images by cli
 RUN pip3 install -e ./
-ENV PYTHONUNBUFFERED True
-ENV CARVEKIT_PORT '5000'
+
+ENV CARVEKIT_PORT '8080'
 ENV CARVEKIT_HOST '0.0.0.0'
 ENV CARVEKIT_SEGMENTATION_NETWORK 'tracer_b7'
 ENV CARVEKIT_PREPROCESSING_METHOD 'none'
@@ -45,7 +45,7 @@ ENV CARVEKIT_BATCH_SIZE_REFINE '1'
 ENV CARVEKIT_SEG_MASK_SIZE '640'
 ENV CARVEKIT_MATTING_MASK_SIZE '2048'
 ENV CARVEKIT_REFINE_MASK_SIZE '900'
-ENV CARVEKIT_AUTH_ENABLE '1'
+ENV CARVEKIT_AUTH_ENABLE '0'
 ENV CARVEKIT_FP16 '0'
 ENV CARVEKIT_TRIMAP_PROB_THRESHOLD=231
 ENV CARVEKIT_TRIMAP_DILATION=30
@@ -53,10 +53,9 @@ ENV CARVEKIT_TRIMAP_EROSION=5
 
 # Tokens will be generated automatically every time the container is restarted if ENV is not set.
 
-# ENV CARVEKIT_ADMIN_TOKEN 'admin_token' # Do not use this env when creating an image as it is not safe.
+ENV CARVEKIT_ADMIN_TOKEN 'Tumplate2020'
 # ENV CARVEKIT_ALLOWED_TOKENS 'test_token1,test_token2' # Do not use this env when creating an image as it is not safe.
 
-EXPOSE 5000
+EXPOSE 8080
 
-#CMD ["/bin/sh", "-c", "uvicorn carvekit.web.app:app --proxy-headers --host $CARVEKIT_HOST --port $PORT"]
-CMD ["uvicorn", "carvekit.web.app:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "80"]
+CMD ["/bin/sh", "-c", "uvicorn carvekit.web.app:app --host 0.0.0.0 --port 8080"]

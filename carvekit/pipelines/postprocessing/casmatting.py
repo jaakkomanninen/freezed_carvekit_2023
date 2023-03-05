@@ -25,8 +25,8 @@ class CasMattingMethod:
 
     def __init__(
         self,
-        refining_module: Union[CascadePSP],
-        matting_module: Union[FBAMatting],
+        refining_module: CascadePSP,
+        matting_module: FBAMatting,
         trimap_generator: Union[TrimapGenerator, CV2TrimapGenerator],
         device="cpu",
     ):

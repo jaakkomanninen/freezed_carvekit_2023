@@ -30,7 +30,7 @@ def req_file(filename: str, folder: str = "."):
 
 
 setup(
-    name="carvekit" if IS_COLAB_PACKAGE is None else "carvekit_colab",
+    name="carvekit",
     version=version,
     author="Nikita Selin (Anodev)",
     author_email="farvard34@gmail.com",

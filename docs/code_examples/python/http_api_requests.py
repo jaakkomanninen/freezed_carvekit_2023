@@ -8,7 +8,7 @@ import requests
 from pathlib import Path
 
 response = requests.post(
-    "http://localhost:5000/api/removebg",
+    "http://localhost:80/api/removebg",
     files={"image_file": Path("images/4.jpg").read_bytes()},
     data={"size": "auto"},
     headers={"X-Api-Key": "test"},
