@@ -190,8 +190,6 @@ async def removebg(
         dataset), headers={'Content-type': 'application/json'})
 
     while ml_processor.job_status(job_id) != "finished":
-        requests.post(webhookurl, data=json.dumps(
-        dataset), headers={'Content-type': 'application/json'})
         if ml_processor.job_status(job_id) == "not_found":
             return JSONResponse(
                 content=error_dict("Job ID not found!"), status_code=500
