@@ -29,7 +29,6 @@ class MLProcessor(threading.Thread):
             self.interface = init_interface(self.api_config)
         while True:
             # Clear unused completed jobs every hour
-            logger.info(f"current tasks: {self.completed_jobs}/{self.jobs}")
             if time.time() - unused_completed_jobs_timer > 120:
                 self.clear_old_completed_jobs()
                 unused_completed_jobs_timer = time.time()
@@ -48,7 +47,7 @@ class MLProcessor(threading.Thread):
                     logger.error(f"Something went wrong with Task Queue: {str(e)}")
                 gc.collect()
             else:
-                time.sleep(1)
+                time.sleep(5)
                 continue
 
     def clear_old_completed_jobs(self):
