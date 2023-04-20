@@ -1,9 +1,6 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/js/tailwind.js"></script>
-    <script src="/js/tailwind_plugins.js"></script>
-
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
     <script>
         tailwind.config = {
@@ -30,7 +27,8 @@
             localStorage.setItem("capturelist", JSON.stringify({ "capture_list": [] }));
             console.log(JSON.parse(localStorage.getItem("capturelist")));
             var myHeaders = new Headers();
-            var mytoken = localStorage.getItem('authToken');
+            localStorage.setItem('authToken', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjc0OSwiaWF0IjoxNjgxODY1MzM3fQ.LU2sSNWz4jA0Kbzf-xR6uKLI0j6ADreZTgoQQiZscoo');
+            var mytoken = localStorage.getItem('authToken') ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjc0OSwiaWF0IjoxNjgxODY1MzM3fQ.LU2sSNWz4jA0Kbzf-xR6uKLI0j6ADreZTgoQQiZscoo'
             myHeaders.append("Authorization", `Bearer ${mytoken}`);
             myHeaders.append("Cookie", "XSRF-TOKEN=69037de74da7056731b2d70d05d607a86Qf4FL3Qiv8oDqyqCyy%2F%2ByE%2FcQwvKQGvJ6lngbIqmXEzipNZ4vscMwjLVJXXbVHk89jR47Z7amyREAARHk7K5%2BUWA9tBaOuCHJ6yRqzeA1sY8nex5ZQdJIBfM5Y3WYVv; adonis-session=f41c84d9b75400efcbfa33923b128887zzZi2tnw3DKSpJHTGRDoYDZJn3XxMirW4LW4B2oeG33ddExc96oR526Zup67o4oDmUHnLP04EWnB0OioMT4FN7EvmAfpmrev2f76nMQmAmHMSOAXIa%2F90SLfqU%2FECYGX; adonis-session-values=25772d766ed3610755463bf761bc04763iO8jXx7FllF7bhSAn7xD6x%2BwuoTyeF441OsfG0WS7oTGTI0XvU7jSr3GgqxfcIxZC0JoMLbX%2F%2BJGOBXQ%2BTa8p%2B9102XGLUXZ4f516xvEIU9sTPTse1fQbZT7PkYSQJ1NIQEYYIKykXzddMwqI8HszqQbinXqGi%2FaC3lR3XY0Jg%3D");
 
@@ -114,12 +112,15 @@
         <canvas id="captured-photo"></canvas>
     </div>
     <button type="button" id="zoom" onclick="hideandsave()"
-    class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-teal-500 py-2 mt-2 mb-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-tumplate-500 focus:ring-offset-2">Start preview mode</button>
-</div> </div>
+        class="ml-3 inline-flex justify-center rounded-md border border-transparent bg-teal-500 py-2 mt-2 mb-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-tumplate-500 focus:ring-offset-2">Start
+        preview mode</button>
+    </div>
+    </div>
     <div
-    class="ml-3 inline-flex justify-center rounded-md border border-transparent py-2 mt-2 mb-2 px-4 text-xs font-medium text-gray-400 shadow-sm">Find the correct framing in preview mode. If image looks too wide, tap on preview button again. Once happy with the shot, tap on the image to open the phone's own camera app (for better image capture quality). Click zoom "x2" in actual camera mode. Also click [1:1] at the top of the image in case you don't see it. Remember to pick your input names before this.</div>
-</div>
- <div class="my-12 min-w-full">
+        class="ml-3 inline-flex justify-center rounded-md border border-transparent py-2 mt-2 mb-2 px-4 text-xs font-medium text-gray-400 shadow-sm">
+        Tests.</div>
+    </div>
+    <div class="my-12 min-w-full">
         <p class="block text-xs font-medium text-gray-700">Name for this photo</p>
         <textarea type="text" id="filetitle"
             class="text-2xl w-full border-0 rounded-md mt-4 font-bold tracking-tight text-tumplate-600" value=""
@@ -175,16 +176,17 @@
                         <option value="label">Label</option>
                         <option value="top">Top</option>
                         <option value="instructions">Instructions</option>
+                        <option value="affirmation">Affirmation</option>
                     </select>
                 </div>
-               <div id='custtxt' class="block mt-4">
-                <label for="cust" class="block text-sm font-medium text-gray-700">Custom name input</label>
-                <div class="mt-1">
-                    <input type="text" name="cust" id="cust"
-                        class="block w-full p-4 rounded-md border-gray-300 mb-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        placeholder="Input custom name here or leave blank">
+                <div id='custtxt' class="block mt-4">
+                    <label for="cust" class="block text-sm font-medium text-gray-700">Custom name input</label>
+                    <div class="mt-1">
+                        <input type="text" name="cust" id="cust"
+                            class="block w-full p-4 rounded-md border-gray-300 mb-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            placeholder="Input custom name here or leave blank">
+                    </div>
                 </div>
-            </div>
             </div>
         </fieldset>
     </form>
@@ -315,7 +317,7 @@
             var overlayindx = document.getElementById('prodgrp').selectedIndex;
 
             var opts = [3, 2, 1, 2, 2, 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0];
-            var curOverlay = [0, 0,0,0,0,0,0,0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            var curOverlay = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             document.getElementById("overlay-image").src = overlayArray[curOverlay[document.getElementById('prodgrp').selectedIndex]];
             var tempname = [];
             for (const value of formData.values()) {
@@ -391,7 +393,7 @@
         };
 
         zoomPicker.addEventListener('click', event => {
-          document.getElementById("camera_view").setAttribute('class',"-ml-4");
+            document.getElementById("camera_view").setAttribute('class', "-ml-4");
 
             constraints2.advanced.zoom = 3;
             navigator.mediaDevices.getUserMedia({ video: constraints2 })
@@ -540,161 +542,150 @@
         function sendFile(fileString, newEntry) {
             console.log(newEntry);
             var myEntry = newEntry;
-
-            var apikey = "Tumplate2020";
-            if (apikey == "") { apikey = "Tumplate2020"; };
-            var thisStatus = document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_status`);
-            var returnHere = document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_row`);
-            if (localStorage.getItem('capturelist')) {
-                capturelist = JSON.parse(localStorage.getItem('capturelist'));
-            }
-
-
-            var myHeaders = new Headers();
-            myHeaders.append("X-API-Key", apikey);
-            myHeaders.append("Authorization", `Bearer ${apikey}`);
-
+            const myToken = localStorage.getItem('authToken');
             fetch(fileString)
                 .then(res => res.blob())
                 .then(blob => {
                     var outputFile = blob;
-                    console.log(blob);
 
-                    console.log(outputFile);
-                    var formdata = new FormData();
-                    formdata.append("crop", true);
-                    formdata.append("image_name", String(myEntry.captureName));
-                    formdata.append("crop_margin", "5px");
-                    console.log(formdata);
-                    formdata.append("image_file", outputFile, `${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}`);
+                    var myHeaders = new Headers();
+                    myHeaders.append("Authorization", `Bearer ${myToken}`);
+                    myHeaders.append("Cookie", "XSRF-TOKEN=882bb94fe0cc3dc7481724ff34e69a64vqs2Z91ok0nyMxPGO3Wj0IR7b5MZX1jGU7Wav7LcgE9Gjm7npYBOvCg%2BM1g6gwCT2vnStB459SsAIP2HfSl3Nz7eIvM7fVNfpDI%2F1avC%2FbHIs%2FUAUQT4Q6UYBoZ2oqvd; adonis-session=071e088dd85732dcf06748910e432e24KBkYY%2B%2BHq%2FIBEKg6CWdd9L%2ByHK7iUudV%2FCpjeUPBN0GYovGVlkHAoJutBeaKR6fvBYMO4v8OT3dWA06jbchnE%2FOVWvIKdF2rhQDf9DaoGPLj5EH3JSk9jYbK8x74ixJh; adonis-session-values=6eb308eb445e7453d25985e2681bc413sOW5IfckzyEW5dcStvGwdRFeyUjk6ng73z9c9SRzA1j%2FnWxe7VOuZtbLRimJ3xMEaMxVhByQDB2Xe0TyZbEkDz3q%2BLrsXA1WjCrqfXxRAF8HQAZ4ErRFKaD871Ccksf0SCz07MwS8XqrVX%2FE8IPQIyBV0XFFe0P5G3tYQyCr4%2BA%3D");
 
-                    var requestOptions = {
+                    var formdata0 = new FormData();
+                    formdata0.append("file", outputFile, myEntry.captureName + ".jpg");
+
+                    var requestOptionsDup = {
                         method: 'POST',
                         headers: myHeaders,
-                        body: formdata,
                         redirect: 'follow'
                     };
-                    console.log('key started with api key: ' + apikey);
-                    document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_status`).innerHTML = `<p class="text-xs">Status</p><p class="text-xs text-tumplate-600">Sent to AI engine</p>`;
-                    document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_status`).onclick = "logg('refresh function coming up')"
-                    fetch("/api/removebg", requestOptions)
-                        .then(response => response.blob())
-                        .then(blob => {
-                            if (blob.type == 'image/png') {
-                                console.log('blob type is' + blob.type)
-                                // create a new image element
-                                const keyedimg = new Image();
-                                keyedimg.onload = () => {
-                                    // call the processImage function with the image element
-                                    const processedData = processImage(keyedimg);
-                                    console.log(processedData);
-                                };
-                                // set the image source to the blob data
-                                var objectUrl = URL.createObjectURL(blob);
-                                keyedimg.src = objectUrl;
+                    var requestOptionsPostImage = {
+                        method: 'POST',
+                        headers: myHeaders,
+                        body: formdata0,
+                        redirect: 'follow'
+                    };
+                    var requestOptionsGetFileID = {
+                        method: 'GET',
+                        headers: myHeaders,
+                        redirect: 'follow'
+                    };
+
+                    fetch(`https://api.tumplate.com/api/video-drafts/35017/duplicate`, requestOptionsDup)
+                        .then(response => response.json())
+                        .then(result => {
+                            const { id } = result;
+                            fetch(`https://api.tumplate.com/api/video-drafts/${id}?withFiles=1`, requestOptionsGetFileID)
+                                .then(response2 => response2.json())
+                                .then(result2 => {
+                                    const draftFilesList = result2.draftFilesList;
+                                    console.log('draftFilesList', draftFilesList);
+                                    const myFile = draftFilesList[2];
+                                    console.log('myFile', myFile);
+                                    fetch(`https://api.tumplate.com/api/temp-files?draft_file_id=${(Number(myFile.id) + 1)}`, requestOptionsPostImage)
+                                        .then(response3 => response3.json())
+                                        .then(result3 => {
+                                            const draftIDtoSend = result3.draft_id;
+                                            console.log('draftIDtoSend', result3);
+                                            var apikey = "";
+                                            if (apikey == "") { apikey = "Tumplate2020"; };
+                                            var thisStatus = document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_status`);
+                                            var returnHere = document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_row`);
+                                            if (localStorage.getItem('capturelist')) {
+                                                capturelist = JSON.parse(localStorage.getItem('capturelist'));
+                                            }
+                                            var myHeaders = new Headers();
+                                            myHeaders.append("X-API-Key", apikey);
+                                            myHeaders.append("Authorization", `Bearer ${apikey}`);
+
+                                            var formdata = new FormData();
+                                            formdata.append("crop", true);
+                                            formdata.append("image_name", String(myEntry.captureName));
+                                            formdata.append("crop_margin", "5px");
+                                            if (result3.previewUrl) {
+                                                formdata.append("image_url", result3.previewUrl);
+                                            }
+                                            else { formdata.append("image_file", outputFile, `${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}`) }
+                                            formdata.append("draft_file_id", myFile.id)
+                                            formdata.append("draft_id", myFile.draft_id)
+                                            formdata.append("tumplate_auth_token", String(myToken));
+                                            // formdata.append("image_file", outputFile, `${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}`);
+
+                                            var requestOptionsXX = {
+                                                method: 'POST',
+                                                headers: myHeaders,
+                                                body: formdata,
+                                                redirect: 'follow'
+                                            };
+                                            console.log('image_url', formdata.get('image_url'), 'form data vals', formdata.get('image_name'), formdata.get('draft_file_id'), formdata.get('tumplate_auth_token'));
+                                            console.log('key started for: ', formdata.get('image_name'), formdata.get('image_url'));
+                                            document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_status`).innerHTML = `<p class="text-xs">Status</p><p class="text-xs text-tumplate-600">Sent to AI engine</p><a href="${result3.previewUrl}" target="_blank"><p class="text-xs text-gray-600">Raw image saved</p></a>`;
+                                            document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_status`).onclick = "logg('refresh function coming up')"
+                                            const myUrl = 'https://tumplateaiapi-wubawcqtea-uc.a.run.app/';
+                                            const baseUrl = window.location.href;
+                                            console.log('requestOptionsXX', requestOptionsXX);
+                                            fetch(`${baseUrl}api/removebg`, requestOptionsXX)
+                                                .then(response => response.blob())
+                                                .then(blob => {
+                                                    if (blob.type == 'image/png') {
+                                                        console.log('blob type is' + blob.type)
+                                                        // create a new image element
+                                                        const keyedimg = new Image();
+                                                        keyedimg.onload = () => {
+                                                            // call the processImage function with the image element
+                                                            const processedData = processImage(keyedimg);
+                                                            console.log(processedData);
+                                                        };
+                                                        // set the image source to the blob data
+                                                        var objectUrl = URL.createObjectURL(blob);
+                                                        keyedimg.src = objectUrl;
 
 
-                                var forwardThis = blob;
-                                var keyedForm = new FormData();
-                                var tumpToken = localStorage.getItem('authToken');
-                                var myHeaders2 = new Headers();
-                                myEntry.downloadURL = objectUrl;
-                                myEntry.status = 'ready';
-                                let div3 = document.createElement('div');
-                                div3.setAttribute('class', "flex-shrink-0")
-                                document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_row`).appendChild(div3);
-                                // Create an <img> element and set its source to the object URL
-                                var img = document.createElement('img');
-                                img.setAttribute('class', "h-20 w-20 object-cover rounded-md");
-                                img.src = objectUrl;
+                                                        var forwardThis = blob;
+                                                        var keyedForm = new FormData();
+                                                        var tumpToken = localStorage.getItem('authToken');
+                                                        var myHeaders2 = new Headers();
+                                                        myEntry.downloadURL = objectUrl;
+                                                        myEntry.status = 'ready';
+                                                        let div3 = document.createElement('div');
+                                                        div3.setAttribute('class', "flex-shrink-0")
+                                                        document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")
+                                                            }_row`).appendChild(div3);
+                                                        // Create an <img> element and set its source to the object URL
+                                                        var img = document.createElement('img');
+                                                        img.setAttribute('class', "h-20 w-20 object-cover rounded-md");
+                                                        img.src = objectUrl;
 
-                                // Append the <img> element to the document
-                                div3.appendChild(img);
-                                document.getElementById(`${String(newEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_raw`).remove();
+                                                        // Append the <img> element to the document
+                                                        div3.appendChild(img);
+                                                        document.getElementById(`${String(newEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")
+                                                            }_raw`).remove();
 
-                                // Create a link with the object URL and set its download attribute
-                                var link = document.createElement('a');
-                                link.href = objectUrl;
-                                link.setAttribute('class', "ml-3 inline-flex justify-center rounded-md border border-transparent bg-teal-500 py-2 mb-2 px-4 text-xs font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-tumplate-500 focus:ring-offset-2")
-                                link.download = `${myEntry.captureName}.png`;
-                                link.innerHTML = `Download`;
-                                document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_status`).innerHTML = `<p class="text-xs">Status</p><p class="text-xs text-green-400">Success (${new Date().toLocaleTimeString()})</p>`
-                                // Append the link to the document
-                                document.getElementById(`${String(newEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}_row`).appendChild(link);
+                                                        // Create a link with the object URL and set its download attribute
+                                                        var link = document.createElement('a');
+                                                        link.href = objectUrl;
+                                                        link.setAttribute('class', "ml-3 inline-flex justify-center rounded-md border border-transparent bg-teal-500 py-2 mb-2 px-4 text-xs font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-tumplate-500 focus:ring-offset-2")
+                                                        link.download = `${myEntry.captureName}.png`;
+                                                        link.innerHTML = `Download`;
+                                                        document.getElementById(`${String(myEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")
+                                                            }_status`).innerHTML = ` < p class= "text-xs" > Status</p > <p class="text-xs text-green-400">Success (${new Date().toLocaleTimeString()})</p>`
+                                                        // Append the link to the document
+                                                        document.getElementById(`${String(newEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")
+                                                            }_row`).appendChild(link);
+                                                    } else {
+                                                        document.getElementById(`${String(newEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")
+                                                            }`).remove();
+                                                        revealAPI()
+                                                    };
+                                                })
 
-                                var myHeaders2 = new Headers();
-
-                                myHeaders2.append("Authorization", `Bearer ${tumpToken}`);
-
-                                var formdatax = new FormData();
-                                formdatax.append("file", forwardThis, `${myEntry.captureName}.png`);
-
-                                var requestOptions2 = {
-                                    method: 'POST',
-                                    headers: myHeaders2,
-                                    body: formdatax,
-                                    redirect: 'follow'
-                                };
-
-                                fetch("https://api.tumplate.com/api/temp-files", requestOptions2)
-                                    .then(response => response.json())
-                                    .then(result => {
-                                        console.log(result)
-                                        var tempid = result.id;
-                                        console.log('lets do a draft with this' + result.id);
-                                        console.log('file name is still: '+myEntry.captureName)
-
-                                        var raw = JSON.stringify({
-                                            "draft_id": 33231,
-                                            "file_id": result.id,
-                                            "title": "image_1",
-                                            "is_original": 1,
-                                            "params": "{\"isGlobalColor\":true,\"tintColor\":1,\"tint\":1,\"refId\":\"image_2\",\"rotate\":0,\"tempId\":null,\"scale\":1,\"use_original\":0,\"is_disabled\":0}"
-                                        });
-
-
-                                        var myHeaders3 = new Headers();
-                                        myHeaders3.append("Authorization", `Bearer ${tumpToken}`);
-                                        myHeaders3.append("Content-Type", "application/json");
-
-                                        var requestOptions3 = {
-                                            method: 'POST',
-                                            headers: myHeaders3,
-                                            body: raw,
-                                            redirect: 'follow'
-                                        };
-
-                                        var requestOptions4 = {
-                                            method: 'POST',
-                                            headers: myHeaders3,
-                                            redirect: 'follow'
-                                        };
-
-                                        fetch("https://api.tumplate.com/api/video-drafts/33231/files/", requestOptions3)
-                                            .then(response => response.json())
-                                            .then(result => {
-                                                console.log(result);
-
-                                                fetch(`https://api.tumplate.com/api/videos?title=${myEntry.captureName}&type=5&draft_id=33231`, requestOptions3)
-                                                    .then(response => response.json())
-                                                    .then(result => {
-                                                        console.log(result)
-
-                                                    });
-                                            });
-
-                                    }
-                                    )
-                                    .catch(error => console.log('error', error));
-
-
-                            } else {
-                                document.getElementById(`${String(newEntry.captureName).replace(/[^a-zA-Z0-9 -]/gm, "")}`).remove();
-                                revealAPI()
-                            };
+                                                .catch(error => console.log('error', error));
+                                        })
+                                })
                         })
-                        .catch(error => { console.log('error', error); revealAPI(); });
                 })
+                .catch(error => { console.log('error', error); revealAPI(); });
         };
 
         function revealAPI() {
