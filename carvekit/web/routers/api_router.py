@@ -38,6 +38,7 @@ async def removebg(
     content_type: str = Header(""),
     image_file_b64: Optional[str] = Form(None),
     draft_id: Optional[str] = Form(None),
+    draft_file_id: Optional[str] = Form(None),
     image_url: Optional[str] = Form(None),
     bg_image_file: Optional[bytes] = File(None),
     size: Optional[str] = Form("full"),
@@ -205,22 +206,14 @@ async def removebg(
         'Authorization': f"Bearer {tumplate_auth_token}",
         }
         tump_user_info = requests.request("GET", url, headers=headers, data=payload)
-        print(tump_user_info.text)
-        payload={}
-        files=[('file',(image_name,result,'image/png'))]
-        headers = {'Authorization': f"Bearer {tumplate_auth_token}"}
-        tempfile_response = requests.request("POST", tempfileurl, headers=headers, data=payload, files=files)
-
-    dataset = {'job_id': str(job_id), 'image_name': str(
-        image_name), 'job_started': str(ts), 'status': 'done!', 'tumplate_temp_id': str(tempfile_response)}
-    form_data = {'file': (f'{image_name}.png', result['data'][0].read(), 'image/png')}
-    headersPost = {'Authorization': f'Bearer {tumplate_auth_token}'}
-    urli = f'https://api.tumplate.com/api/temp-files?draft_file_id={str(draft_file_id)}'
-    logger.info(f"tump draft: {draft_id}, urli: {urli}")
-    response = requests.post(urli, headers=headersPost, files=form_data)
-    logger.debug(f'Temp File created {response.json()}')
+        logger.info(tump_user_info.text)
+        form_data = {'file': (f'{image_name}.png', result['data'][0].read(), 'image/png')}
+        headersPost = {'Authorization': f'Bearer {tumplate_auth_token}'}
+        urli = f'https://api.tumplate.com/api/temp-files?draft_file_id={str(draft_file_id)}'
+        logger.info(f"tump draft: {draft_id}, urli: {urli}")
+        response = requests.post(urli, headers=headersPost, files=form_data)
+        logger.debug(f'Temp File created {response.json()}')
     return handle_response(result, image)
-
 
 @api_router.get("/account")
 def account():
