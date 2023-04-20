@@ -16,7 +16,7 @@ def Authenticate(x_api_key: Union[str, None] = Header(None)) -> Union[bool, str]
         return False
 
 
-def handle_response(response, original_image) -> Response:
+def handle_response(response, original_image, previewUrl, originalName, draftID) -> Response:
     """
     Response handler from TaskQueue
     :param response: TaskQueue response
@@ -53,7 +53,9 @@ def handle_response(response, original_image) -> Response:
         response_object.headers["X-Ratelimit-Reset"] = "1"
         response_object.headers["X-Width"] = str(response["data"][1][0])
         response_object.headers["X-Height"] = str(response["data"][1][1])
-
+        response_object.headers["X-FileUrl"] = str(previewUrl)
+        response_object.headers["X-FileName"] = str(originalName)
+        response_object.headers["X-DraftID"] = str(draftID)
     else:
         response = JSONResponse(content=response[0])
         response.headers["X-Credits-Charged"] = "0"

@@ -210,10 +210,13 @@ async def removebg(
         form_data = {'file': (f'{image_name}.png', result['data'][0].read(), 'image/png')}
         headersPost = {'Authorization': f'Bearer {tumplate_auth_token}'}
         urli = f'https://api.tumplate.com/api/temp-files?draft_file_id={str(draft_file_id)}'
-        logger.info(f"tump draft: {draft_id}, urli: {urli}")
         response = requests.post(urli, headers=headersPost, files=form_data)
-        logger.debug(f'Temp File created {response.json()}')
-    return handle_response(result, image)
+        jsonResp = response.json()
+        logger.info(f'Temp File created {jsonResp}')
+        previewUrl = jsonResp['previewUrl']
+        originalName = jsonResp['file_id']['original']
+        draftID = jsonResp['file_id']['original']
+    return handle_response(result, image, previewUrl, originalName, draftID)
 
 @api_router.get("/account")
 def account():
