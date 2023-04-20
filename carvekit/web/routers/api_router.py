@@ -213,8 +213,12 @@ async def removebg(
 
     dataset = {'job_id': str(job_id), 'image_name': str(
         image_name), 'job_started': str(ts), 'status': 'done!', 'tumplate_temp_id': str(tempfile_response)}
-    weready = requests.post(webhookurl, data=json.dumps(
-        dataset), headers={'Content-type': 'application/json'})
+    form_data = {'file': (f'{image_name}.png', result['data'][0].read(), 'image/png')}
+    headersPost = {'Authorization': f'Bearer {tumplate_auth_token}'}
+    urli = f'https://api.tumplate.com/api/temp-files?draft_file_id={str(draft_file_id)}'
+    logger.info(f"tump draft: {draft_id}, urli: {urli}")
+    response = requests.post(urli, headers=headersPost, files=form_data)
+    logger.debug(f'Temp File created {response.json()}')
     return handle_response(result, image)
 
 
